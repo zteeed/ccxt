@@ -801,7 +801,7 @@ class binance(Exchange):
                 'fetchCurrencies': True,  # self is a private call and it requires API keys
                 # 'fetchTradesMethod': 'publicGetAggTrades',  # publicGetTrades, publicGetHistoricalTrades
                 'defaultTimeInForce': 'GTC',  # 'GTC' = Good To Cancel(default), 'IOC' = Immediate Or Cancel
-                'defaultType': 'spot',  # 'spot', 'future', 'margin', 'delivery'
+                'defaultType': 'spot',  # 'spot', 'future', 'margin', 'delivery', 'funding'
                 'hasAlreadyAuthenticatedSuccessfully': False,
                 'warnOnFetchOpenOrdersWithoutSymbol': True,
                 'fetchPositions': 'positionRisk',  # or 'account'
@@ -1361,8 +1361,11 @@ class binance(Exchange):
         defaultType = self.safe_string_2(self.options, 'fetchMarkets', 'defaultType', 'spot')
         type = self.safe_string(params, 'type', defaultType)
         query = self.omit(params, 'type')
-        if (type != 'spot') and (type != 'future') and (type != 'margin') and (type != 'delivery'):
-            raise ExchangeError(self.id + " does not support '" + type + "' type, set exchange.options['defaultType'] to 'spot', 'margin', 'delivery' or 'future'")  # eslint-disable-line quotes
+        if type not in ['spot', 'future', 'margin', 'delivery', 'funding']:
+            raise ExchangeError(
+                self.id + " does not support '" + type +
+                "' type, set exchange.options['defaultType'] to 'spot', 'margin', 'delivery' or 'future' or 'funding'"
+            )  # eslint-disable-line quotes
         method = 'publicGetExchangeInfo'
         if type == 'future':
             method = 'fapiPublicGetExchangeInfo'
